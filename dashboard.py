@@ -117,7 +117,7 @@ with chart_container2:
 st_fl_df = fl_df[(fl_df['Station']==station) &  
 (fl_df['TEMP']<= -40) & (fl_df['RH_ice'] >= 100) & (fl_df['PRESS_ALT'] >=30000) & 
 (fl_df['PRESS_ALT'] <=43000) & (fl_df['Hour']==h) & (fl_df['Year']== year)]
-st_fl_df['bins'] = pd.cut(st_fl_df['PRESS_ALT'], bins=range(30000, int(st_fl_df['PRESS_ALT'].max()) + 1000, 1000), right=False)
+st_fl_df['bins'] = pd.cut(st_fl_df['PRESS_ALT'], bins=range(30000, int(st_fl_df['PRESS_ALT'].max()) + 1000, 1000), right=False, labels= list(range(30000, int(st_fl_df['PRESS_ALT'].max()), 1000)))
 result = st_fl_df.groupby('bins')['Date'].nunique().reset_index(name='days_count')
 print(result)
 st.bar_chart(result, x= "bins", y= "days_count")
