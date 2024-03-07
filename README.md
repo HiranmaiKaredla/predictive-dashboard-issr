@@ -2,7 +2,7 @@
 The development of a predictive dashboard based on historical climatic readings presents a significant advancement in environmental stewardship in the aviation industry.
 
 
-<video src="imgs/sc_recording1.mov" width="500px"></video>
+<video src="imgs/sc_recording1.mp4" width="500px"></video>
 ### Setup
 To run the dashboard
 ```
