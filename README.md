@@ -8,3 +8,9 @@ To run the dashboard
 ```
 streamlit run dashboard.py
 ```
+
+
+
+
+https://github.com/HiranmaiKaredla/predictive-dashboard-issr/assets/30773275/e35f15a4-0f3e-40f3-8970-1a86319403da
+
