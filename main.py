@@ -15,7 +15,7 @@ def record_reading(lines):
             s = line.split(" ")
             y,d,m,h = s[1], s[2], s[3], s[4]
         else:
-            if y in ['2022', '2023']:
+            if y in ['2022', '2023', '2024']:
                 date = " ".join([y,d,m])
                 hour = h
                 data = [0]*13
@@ -95,6 +95,18 @@ def convert_RH(RH_water, T):
         ew = math.pow(10,e_w)
         e_i = -9.09718*((273.16/T)-1) - (3.56654 * log10(273.16/T)) + 0.876793*(1-(T/273.16)) + log10(eio)
         ei = math.pow(10,e_i)
+
+        ei = 100.0 * np.exp(  # type: ignore[return-value]
+        (-6024.5282 / T)
+        + 24.7219
+        + (0.010613868 * T)
+        - (1.3198825e-5 * (T**2))
+        - 0.49382577 * np.log(T)
+    )
+        ew = 100.0 * np.exp(  # type: ignore[return-value]
+        -6096.9385 / T + 16.635794 - 0.02711193 * T + 1.673952 * 1e-5 * T**2 + 2.433502 * np.log(T)
+    )
+    
         
         return (ew/ei)*RH_water
 
@@ -104,7 +116,7 @@ def calculate_pressure_altitude(press):
     return press_alt_feet
 
 def data_loading(station_name):
-    file = open(data_path+"/"+station_codes[station_name]+"-data.txt", 'r')
+    file = open(data_path+"/"+station_codes[station_name]+"-data 2.txt", 'r')
     lines = file.readlines()
     records = record_reading(lines)
     header = ['Date', 'Hour','LVLTYP1', 'LVLTYP2', 'ETIME', 'PRESS', 'PFLAG', 'GPH', 'ZFLAG', 'TEMP', 'TFLAG', 'RH', 'DPDP', 'WDIR', 'WSPD']
