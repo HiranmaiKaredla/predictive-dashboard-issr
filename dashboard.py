@@ -29,6 +29,7 @@ def setup():
 
 st.title("Dashboard for ISSR conditions")
 df = setup()
+alt_df = df
 # df.to_csv("./data/all_stations_data.csv", na_rep= "NA",index=False)
 # return 0
 

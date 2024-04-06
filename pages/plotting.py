@@ -1,13 +1,13 @@
 import streamlit as st
 import numpy as np
-from dashboard import df
+from dashboard import alt_df
 import plotly.express as px
 
 
 
 altitude = st.selectbox('Pressure Altitude', list(range(30000, 44000, 500)))
 h = st.selectbox('select hour', ["12", '00'])
-alt_df = df[(df['Date'] >= "2024-01-01") & (df['PRESS_ALT'] >=30000) & (df['PRESS_ALT'] <= 44000)]
+alt_df = alt_df[(alt_df['Date'] >= "2024-01-01") & (alt_df['PRESS_ALT'] >=30000) & (alt_df['PRESS_ALT'] <= 44000)]
 alt_df['PRESS_ALT'] = np.round(alt_df['PRESS_ALT'] / 500) * 500
 alt_df = alt_df[['Date', 'Hour', 'PRESS_ALT','TEMP', 'RH_ice']].groupby(['Date', 'Hour', 'PRESS_ALT']).mean().reset_index()
 #print(alt_df.head())
