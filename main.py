@@ -3,9 +3,6 @@ import re
 import numpy as np
 import math
 from math import log, log10
-
-import seaborn as sns
-import matplotlib.pyplot as plt
 from config import *
 
 def record_reading(lines):
