@@ -2,16 +2,20 @@ import streamlit as st
 import numpy as np
 from dashboard import alt_df
 import plotly.express as px
+from config import station_names
 
-
-
+station1 = st.selectbox(
+            "Select the station name",
+            station_names,
+        )
 altitude = st.selectbox('Pressure Altitude', list(range(30000, 44000, 500)))
 h = st.selectbox('select hour', ["12", '00'])
-alt_df = alt_df[(alt_df['Date'] >= "2024-01-01") & (alt_df['PRESS_ALT'] >=30000) & (alt_df['PRESS_ALT'] <= 44000)]
+alt_df = alt_df[(alt_df['Station']== station1) & (alt_df['Date'] >= "2024-01-01") & (alt_df['PRESS_ALT'] >=30000) & (alt_df['PRESS_ALT'] <= 44000)]
 alt_df['PRESS_ALT'] = np.round(alt_df['PRESS_ALT'] / 500) * 500
 alt_df = alt_df[['Date', 'Hour', 'PRESS_ALT','TEMP', 'RH_ice']].groupby(['Date', 'Hour', 'PRESS_ALT']).mean().reset_index()
 #print(alt_df.head())
 fig4 = px.line(alt_df[(alt_df['PRESS_ALT']==altitude) &(alt_df['Hour']==h)], x='Date', y="TEMP")
+fig4.update_layout(yaxis_range=[-38,-65])
 fig5 = px.line(alt_df[(alt_df['PRESS_ALT']==altitude) &(alt_df['Hour']==h)], x='Date', y="RH_ice")
 st.plotly_chart(fig4)
 st.plotly_chart(fig5)

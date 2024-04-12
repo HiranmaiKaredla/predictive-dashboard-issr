@@ -61,7 +61,8 @@ for i in range(1,13):
 month_df = pd.DataFrame(columns = ['Months', 'No of Days', 'No of obs'])
 month_df['Months'] = months
 month_df['No of Days'] = orig
-month_df['No of obs'] = obs
+month_df['No of ISSR'] = obs
+month_df['No of No-ISSR'] = month_df['No of Days'] - month_df['No of ISSR']
 month_df_long = month_df.melt(id_vars='Months', var_name='Value_Type', value_name='Days')
 #print(month_df_long)
 #st.bar_chart(data = month_df, x='Months', y=['No of Days', 'No of obs'])
@@ -79,11 +80,28 @@ month_df_long = month_df.melt(id_vars='Months', var_name='Value_Type', value_nam
 
 # st.altair_chart(chart)
 
-fig = px.histogram(month_df_long, x="Months", y="Days",
-             color='Value_Type', barmode='group',
-             #histfunc='count',
-             height=400, width=800)
+# fig = px.histogram(month_df_long, x="Months", y="Days",
+#              color='Value_Type', barmode='group',
+#              #histfunc='count',
+#              height=400, width=800)
+fig = px.bar(month_df, x= "Months", y =["No of ISSR", "No of No-ISSR"], title="Monthly ISSR occurances", color_discrete_sequence = px.colors.qualitative.Pastel)
 st.plotly_chart(fig)
+
+## Hourly chart
+hourly_df = pd.DataFrame()
+hours = list(df['Hour'].unique())
+hourly_df['Hour'] = hours
+issr_hours= []
+nonissr_hours = []
+for hour in hours:
+    issr_hours.append(issr_df[(issr_df['Station']==station) & (issr_df['Year']==year) & (issr_df['Hour']==hour)]['Date'].nunique())
+    nonissr_hours.append(df[(df['Station']==station) & (df['Year']==year) & (df['Hour']==hour)]['Date'].nunique() - issr_hours[-1])
+
+hourly_df['No of ISSR'] = issr_hours
+hourly_df['No of Non-ISSR'] = nonissr_hours
+fig_h = px.bar(hourly_df, x= "Hour", y =["No of ISSR", "No of Non-ISSR"], title="Hourly ISSR occurances", color_discrete_sequence = px.colors.qualitative.Pastel)
+st.plotly_chart(fig_h)
+
 
 st_fl_df = fl_df[(fl_df['Station']==station) &  
 (fl_df['TEMP']<= -40) & (fl_df['RH_ice'] >= 100) & (fl_df['PRESS_ALT'] >=30000) & 
@@ -124,47 +142,54 @@ col1, col2 = st.columns(2)
 with col1:
     d = st.date_input('pick a date',end_date, min_value=start_date, max_value=end_date)
 with col2:
-    pass
-    #h = st.selectbox('select hour', hours)
+    h_day = st.selectbox('Hour', ["00", "12"])
 
-chart_container2 = st.container()
-col1, col2 = st.columns(2)
-with chart_container2:
+fig_day1= px.scatter(fl_df[(fl_df['Date']==pd.to_datetime(d))& (fl_df['Hour']==h_day) & (fl_df['PRESS_ALT'] <=43000)], x="RH_ice", y="PRESS_ALT", color = 'Station', color_discrete_sequence = px.colors.qualitative.Set1)
+fig_day1.add_vline(x=100, line_width=2, line_dash="dash", line_color="green")
+st.plotly_chart(fig_day1)
 
-    if d:
-        sample = fl_df[(fl_df['Station']== station) &(fl_df['Date']==pd.to_datetime(d))& (fl_df['Hour']==h) & (fl_df['PRESS_ALT'] <=43000)]
-        with col1:
-            #st.scatter_chart(sample, x="RH_ice", y="PRESS_ALT")
-            base_chart = alt.Chart(sample).mark_circle().encode(
-                x='RH_ice',
-                y='PRESS_ALT'
-            )
+fig_day2= px.scatter(fl_df[(fl_df['Date']==pd.to_datetime(d))& (fl_df['Hour']==h_day) & (fl_df['PRESS_ALT'] <=43000)], x="TEMP", y="PRESS_ALT", color = 'Station', color_discrete_sequence = px.colors.qualitative.Set1)
+fig_day2.add_vline(x=-40, line_width=2, line_dash="dash", line_color="green")
+st.plotly_chart(fig_day2)
+
+# chart_container2 = st.container()
+# col1, col2 = st.columns(2)
+# with chart_container2:
+
+#     if d:
+#         sample = fl_df[(fl_df['Station']== station) &(fl_df['Date']==pd.to_datetime(d))& (fl_df['Hour']==h) & (fl_df['PRESS_ALT'] <=43000)]
+#         with col1:
+#             #st.scatter_chart(sample, x="RH_ice", y="PRESS_ALT")
+#             base_chart = alt.Chart(sample).mark_circle().encode(
+#                 x='RH_ice',
+#                 y='PRESS_ALT'
+#             )
             
-            vertical_line = alt.Chart(pd.DataFrame({'RH_ice': [100]})).mark_rule(color='red').encode(
-                x='RH_ice:Q'
-            )
-            chart = (base_chart + vertical_line).properties(
-                #title='Scatter Plot with Vertical Line'
-            )
+#             vertical_line = alt.Chart(pd.DataFrame({'RH_ice': [100]})).mark_rule(color='red').encode(
+#                 x='RH_ice:Q'
+#             )
+#             chart = (base_chart + vertical_line).properties(
+#                 #title='Scatter Plot with Vertical Line'
+#             )
 
-            st.altair_chart(chart, use_container_width=True)
-        with col2:
+#             st.altair_chart(chart, use_container_width=True)
+#         with col2:
 
-            #st.scatter_chart(sample, x = "TEMP_F", y = "PRESS_ALT", color= "#ffaa00" )
-            base_chart = alt.Chart(sample).mark_circle(size= 70,color='orange').encode(
-                x='TEMP',
-                y='PRESS_ALT',
-                tooltip=['TEMP', 'PRESS_ALT']
-            )
+#             #st.scatter_chart(sample, x = "TEMP_F", y = "PRESS_ALT", color= "#ffaa00" )
+#             base_chart = alt.Chart(sample).mark_circle(size= 70,color='orange').encode(
+#                 x='TEMP',
+#                 y='PRESS_ALT',
+#                 tooltip=['TEMP', 'PRESS_ALT']
+#             )
             
-            vertical_line = alt.Chart(pd.DataFrame({'TEMP': [-40]})).mark_rule(color='red').encode(
-                x='TEMP:Q'
-            )
-            chart = (base_chart + vertical_line).properties(
-                #title='Scatter Plot with Vertical Line'
-            )
+#             vertical_line = alt.Chart(pd.DataFrame({'TEMP': [-40]})).mark_rule(color='red').encode(
+#                 x='TEMP:Q'
+#             )
+#             chart = (base_chart + vertical_line).properties(
+#                 #title='Scatter Plot with Vertical Line'
+#             )
 
-            st.altair_chart(chart, use_container_width=True)
+#             st.altair_chart(chart, use_container_width=True)
 
 
 ################################
